@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090A0C" />
+  <meta name="description" content="Goathi Setups: setups para F1 26 DLC. Qualifying, Race, Parc Fermé e Intermediário. Setup individual por R$ 6,90 e pack completo por R$ 79,90." />
+  <title>Goathi Setups | Performance is built.</title>
+  <link rel="icon" type="image/png" href="./favicon.png?v=2" />
+  <script>
+    // Aplica o tema salvo antes da pintura para evitar o flash de cor.
+    try {
+      var savedTheme = localStorage.getItem('goathi-theme');
+      var initialTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.dataset.theme = initialTheme;
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', initialTheme === 'light' ? '#F5F5F5' : '#090A0C');
+    } catch (error) { /* O tema escuro funciona mesmo sem armazenamento. */ }
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="./src/main.jsx"></script>
+</body>
+</html>

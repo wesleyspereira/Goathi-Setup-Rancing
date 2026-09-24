@@ -1,0 +1,46 @@
+GOATHI SETUPS — TEMAS CLARO E ESCURO
+
+1. Extraia este ZIP.
+2. Na pasta loja-setups, abra o terminal e execute:
+   npm install
+   npm run dev
+3. Para gerar a versão de produção:
+   npm run build
+   O resultado fica na pasta dist.
+
+ALTERAÇÕES
+- Temas claro e escuro, com botão no cabeçalho e preferência salva.
+- Na primeira visita, o site acompanha o tema do dispositivo.
+- Logo branca no tema escuro e preta no claro, usando os PNGs enviados.
+- Vermelho Goathi #E30613, novos textos, slogan e preços.
+- Setup individual: R$ 6,90. Pack completo: R$ 79,90.
+- Seleção de configuração/circuito e resumo do pedido.
+- Duas novas fotos na seção sobre a marca e no setup intermediário.
+- Vídeo original mantido. Movimento com mouse/foco; em dispositivos de toque,
+  reprodução quando visível, sujeita à política do navegador.
+
+PAGAMENTO DIRETO — AINDA PRECISA DOS LINKS REAIS
+Abra src/data/shop.js e preencha os endereços HTTPS em checkout.
+Há um link para cada configuração individual e outro para o pack completo.
+O checkout externo de um setup individual deve permitir selecionar o circuito.
+Os campos do site não são automaticamente enviados a um provedor de pagamento.
+Enquanto os links estiverem vazios, o botão final envia um pedido ao WhatsApp
+com produto, circuito e preço. Não há cobrança nem entrega automática no site.
+A integração automática de pagamento/entrega exige uma etapa adicional.
+
+CONTEÚDO FUTURO
+Feedbacks, pilotos, parceiros e resultados não foram incluídos: precisam de
+materiais reais e autorização de uso. As logos recebidas são PNGs, não vetores.
+
+ARQUIVOS PRINCIPAIS
+src/App.jsx — seções, tema, seleção do produto e pedido.
+src/App.css — layout e responsividade.
+src/index.css — paletas dos temas.
+src/data/shop.js — preços, número do WhatsApp e links de checkout.
+index.html — título, descrição e aplicação inicial do tema.
+
+PUBLICAÇÃO
+Atualize os arquivos do seu projeto e publique pelo fluxo que já utiliza.
+O pacote não inclui node_modules, dist ou o histórico .git. Se for copiar para
+seu repositório atual, mantenha a pasta .git que já existe no seu computador.
+O site não foi publicado automaticamente.

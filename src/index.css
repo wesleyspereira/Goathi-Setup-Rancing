@@ -1,0 +1,103 @@
+/* As cores dos dois temas ficam centralizadas aqui. */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #090a0c;
+  --surface: #111216;
+  --surface-alt: #181a1f;
+  --text: #f5f5f5;
+  --muted: #a5a9b2;
+  --border: #2c2e35;
+  --red: #e30613;
+  --red-hover: #b80510;
+  --accent-text: #ff5963;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-alt: #ebedef;
+  --text: #111216;
+  --muted: #555b65;
+  --border: #d4d7dc;
+  --accent-text: #b80510;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--accent-text);
+  outline-offset: 4px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--red);
+  color: white;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
