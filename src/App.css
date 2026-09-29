@@ -378,7 +378,7 @@ h2 {
 
 .product-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 12px;
   border-top: 1px solid var(--border);
@@ -386,6 +386,23 @@ h2 {
   margin-top: auto;
 }
 
+.product-footer button {
+  background: transparent;
+  border: 0;
+  color: var(--accent-text);
+
+  min-height: 50px;
+  width: 100%;
+
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+
+  padding: 10px 0;
+
+  text-align: center;
+  cursor: pointer;
+}
 .product-footer>span {
   font-size: 20px;
   font-weight: 700;
@@ -398,16 +415,6 @@ h2 {
   font-size: 10px;
 }
 
-.product-footer button {
-  background: transparent;
-  border: 0;
-  color: var(--accent-text);
-  min-height: 44px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .5px;
-  padding: 6px 0 6px 10px;
-}
 
 /* Produtos e preços. */
 .pricing-section {
@@ -607,83 +614,6 @@ h2 {
   gap: 72px;
 }
 
-.package-gallery {
-  margin: 0;
-  padding: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-.package-gallery-stage {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  background: #090a0c;
-  touch-action: pan-y;
-}
-
-.package-gallery-slide {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .6s, visibility .6s;
-}
-
-.package-gallery-slide.is-active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.package-gallery-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.gallery-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 48px;
-  border: 1px solid #ffffff50;
-  background: #090a0ccc;
-  color: white;
-  font-size: 32px;
-  z-index: 1;
-}
-
-.gallery-prev {
-  left: 8px;
-}
-
-.gallery-next {
-  right: 8px;
-}
-
-.gallery-controls {
-  color: var(--muted);
-  font-size: 11px;
-  padding-top: 12px;
-}
-
-.package-gallery figcaption {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 8px;
-}
-
-.package-gallery figcaption strong {
-  color: var(--text);
-}
-
-.package-gallery a:focus-visible,
-.package-gallery button:focus-visible {
-  outline-offset: -3px;
-}
-
 .gallery-copy>p:not(.eyebrow) {
   color: var(--muted);
   margin-top: 24px;
@@ -855,6 +785,7 @@ h2 {
   color: var(--muted);
   margin: 16px 0 0;
 }
+
 /* Parceiros no rodapé */
 .partners {
   padding-block: 56px;
@@ -862,7 +793,7 @@ h2 {
   text-align: center;
 }
 
-.partners > .eyebrow {
+.partners>.eyebrow {
   justify-content: center;
 }
 
@@ -918,6 +849,29 @@ h2 {
   margin: 18px 0 0;
   color: var(--text);
   font-size: 16px;
+}
+
+.order-fields textarea {
+  display: block;
+  width: 100%;
+  min-height: 70px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 400;
+  resize: vertical;
+}
+
+.order-fields textarea::placeholder {
+  color: var(--muted);
+}
+.order-fields textarea:focus-visible {
+  outline: none;
+  border-color: var(--border);
 }
 
 @media (max-width: 640px) {
@@ -1181,5 +1135,324 @@ h2 {
 
   .dialog-close {
     margin: -12px -6px 12px auto;
+  }
+}
+
+/* Publicações: botão à direita, sem preço no card. */
+.product-footer {
+  justify-content: center;
+}
+
+/* Galeria 3D: imagem central inteira e duas laterais de cada lado. */
+.brand-materials .materials-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+}
+
+.gallery-copy {
+  max-width: 680px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.gallery-copy .eyebrow,
+.gallery-copy .setup-tags {
+  justify-content: center;
+}
+
+.gallery-copy .button {
+  margin-top: 8px;
+}
+
+.setup-carousel {
+  margin: 0;
+  min-width: 0;
+  padding: 24px 0;
+  border-block: 1px solid var(--border);
+  background: radial-gradient(ellipse at 50% 45%, var(--surface-alt), transparent 72%);
+}
+
+.setup-carousel-stage {
+  position: relative;
+  height: clamp(240px, 32vw, 390px);
+  overflow: hidden;
+  perspective: 1100px;
+  touch-action: pan-y;
+}
+
+.setup-carousel-slide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: min(48%, 560px);
+  aspect-ratio: 586 / 297;
+
+  display: block;
+
+  border: 2px solid var(--border);
+  border-radius: 12px;
+
+  background: transparent;
+
+  box-shadow: 0 18px 30px #0004;
+
+  overflow: hidden;
+
+  transform:
+    translate(-50%, -50%)
+    translateX(var(--shift))
+    translateZ(calc(var(--distance) * -115px))
+    rotateY(var(--angle));
+
+  opacity: .75;
+
+  transition:
+    transform 650ms ease,
+    opacity 650ms ease,
+    border-color 650ms ease;
+}
+
+.setup-carousel-slide[data-hidden="true"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.setup-carousel-slide.is-active {
+  border-color: var(--red);
+  opacity: 1;
+}
+
+.setup-carousel-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+
+  user-select: none;
+}
+
+.setup-carousel-slide:focus-visible {
+  outline-offset: -5px;
+}
+
+.setup-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.setup-carousel-controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 18px;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  color: var(--text);
+  background: var(--surface-alt);
+  font-size: 24px;
+}
+
+.setup-carousel-controls button span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.setup-carousel-controls button:hover {
+  border-color: var(--red);
+}
+
+.setup-carousel-count {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.setup-carousel-controls .setup-carousel-pause {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.setup-carousel figcaption {
+  display: grid;
+  gap: 4px;
+  padding: 22px 16px 0;
+  text-align: center;
+}
+
+.setup-carousel figcaption strong {
+  font-size: 18px;
+}
+
+.setup-carousel figcaption span,
+.setup-carousel-hint {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.setup-carousel-hint {
+  margin: 14px 16px 0;
+  text-align: center;
+  font-size: 11px;
+}
+/* Preenche o quadro com uma cópia desfocada */
+.setup-carousel-slide .carousel-image-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(18px) brightness(0.65);
+  transform: scale(1.15);
+  pointer-events: none;
+}
+
+/* Mantém a imagem principal inteira, sem cortar */
+.setup-carousel-slide .carousel-image-main {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Bandeiras locais: 28 x 20 px, tanto na lista quanto na pista selecionada. */
+.track-field {
+  min-width: 0;
+}
+
+.track-field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.track-picker {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.track-picker summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 10px 12px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.track-picker summary::-webkit-details-marker {
+  display: none;
+}
+
+#track-value {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.track-chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.track-picker[open] .track-chevron {
+  transform: rotate(180deg);
+}
+
+.track-picker .track-flag {
+  display: block;
+  width: 28px;
+  height: 20px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.track-options {
+  max-height: 220px;
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+}
+
+.track-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+}
+
+.track-option span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.track-option:hover,
+.track-option[aria-pressed="true"] {
+  background: var(--surface-alt);
+}
+
+.track-option[aria-pressed="true"] {
+  color: var(--accent-text);
+}
+
+.track-picker summary:focus-visible,
+.track-option:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: -2px;
+}
+
+.track-error {
+  margin: 6px 0 0;
+  color: var(--accent-text);
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .setup-carousel-stage {
+    height: clamp(180px, 62vw, 320px);
+    perspective: 750px;
+  }
+
+  .setup-carousel-slide {
+    width: 82%;
+  }
+
+  .setup-carousel-controls {
+    gap: 8px;
+  }
+
+  .setup-carousel-controls button {
+    padding-inline: 12px;
+  }
+
+  .setup-carousel figcaption {
+    min-height: 90px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .setup-carousel-slide {
+    transition: none;
   }
 }

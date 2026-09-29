@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://goathi-setups.vercel.app/sitemap.xml

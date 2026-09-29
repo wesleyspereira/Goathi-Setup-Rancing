@@ -1,0 +1,40 @@
+<!-- COLE DENTRO DO <head> DO index.html -->
+
+<title>Goathi Setups | Setups F1 26 para Qualifying, Race e Pista Molhada</title>
+
+<meta name="description"
+      content="Goathi Setups: setups para F1 26 com foco em qualifying, race, parc fermé e pista molhada. Encontre configurações para mais velocidade, equilíbrio e consistência." />
+
+<meta name="keywords"
+      content="Goathi Setups, F1 26 setup, setup F1 26, setups F1 26, qualifying setup F1 26, race setup F1 26, parc fermé setup F1 26, setup chuva F1 26, setup pista molhada F1 26, setup Fórmula 1 game, setup corrida F1 26" />
+
+<meta name="robots" content="index, follow" />
+<meta name="author" content="Goathi Setups" />
+<link rel="canonical" href="https://goathi-setups.vercel.app/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Goathi Setups" />
+<meta property="og:title" content="Goathi Setups | Setups F1 26" />
+<meta property="og:description"
+      content="Setups para F1 26 desenvolvidos para qualifying, corrida, parc fermé e condições de pista molhada." />
+<meta property="og:url" content="https://goathi-setups.vercel.app/" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Goathi Setups | Setups F1 26" />
+<meta name="twitter:description"
+      content="Setups para F1 26 com foco em velocidade, equilíbrio e consistência." />
+
+<!-- DADOS ESTRUTURADOS PARA O GOOGLE -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Goathi Setups",
+  "url": "https://goathi-setups.vercel.app/",
+  "sameAs": [
+    "https://www.instagram.com/goathisetups/"
+  ],
+  "description": "Setups para F1 26 com configurações para qualifying, race, parc fermé e pista molhada."
+}
+</script>

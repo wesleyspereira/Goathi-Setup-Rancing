@@ -1,0 +1,53 @@
+GOATHI SETUPS — ARQUIVOS PARA GOOGLE / SEO
+
+1. COPIE ESTES DOIS ARQUIVOS PARA A PASTA public DO PROJETO:
+   public/robots.txt
+   public/sitemap.xml
+
+2. ABRA O index.html DO PROJETO.
+   Copie o conteúdo de:
+   SEO-HEAD-PARA-index.html.txt
+   e cole dentro da tag <head>.
+
+3. PUBLIQUE NOVAMENTE NA VERCEL.
+
+4. TESTE NO NAVEGADOR:
+   https://goathi-setups.vercel.app/robots.txt
+   https://goathi-setups.vercel.app/sitemap.xml
+
+5. GOOGLE SEARCH CONSOLE
+   - Adicione a propriedade:
+     https://goathi-setups.vercel.app
+   - Faça a verificação solicitada pelo Google.
+   - Em "Sitemaps", envie:
+     sitemap.xml
+   - Depois use "Inspeção de URL" na página inicial e solicite indexação.
+
+PALAVRAS E TERMOS USADOS:
+- Goathi Setups
+- F1 26 setup
+- setup F1 26
+- setups F1 26
+- qualifying setup F1 26
+- race setup F1 26
+- parc fermé setup F1 26
+- setup chuva F1 26
+- setup pista molhada F1 26
+- setup corrida F1 26
+
+IMPORTANTE:
+A tag meta keywords foi incluída porque você pediu palavras-chave, mas o Google não depende dela para ranquear.
+Os elementos mais importantes são:
+- título da página;
+- descrição;
+- textos reais da página;
+- headings (h1/h2);
+- links;
+- sitemap;
+- site acessível e indexável;
+- conteúdo útil e específico.
+
+NÃO criei o arquivo de verificação do Google Search Console porque o nome/código desse arquivo é exclusivo da sua conta.
+Quando o Google fornecer algo como:
+googlexxxxxxxxxxxxxxxx.html
+baixe esse arquivo no Search Console e coloque também dentro de public/.
