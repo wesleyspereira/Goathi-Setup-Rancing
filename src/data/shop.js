@@ -1,29 +1,16 @@
+// Preços das três opções. Os cards superiores não exibem valores.
 export const shop = {
   prices: {
-    cards: 79.90,      // Preço dos quatro cards de cima
-    individual: 6.90,  // Setup individual
-    pack: 79.90,       // Pack completo
+    individual: 6.90,
+    intermediate: 39.90,
+    pack: 79.90,
   },
-
   whatsapp: '5527996452596',
-
-  // Cole os links HTTPS de pagamento entre as aspas.
-  // Enquanto estiverem vazios, o pedido segue pelo WhatsApp.
+  // Um link HTTPS por produto. Vazio = pedido pelo WhatsApp.
+  // No checkout externo do individual, confirme a seleção do circuito.
   checkout: {
-    cards: {
-      qualifying: '',
-      race: '',
-      'parc-ferme': '',
-      intermediate: '',
-    },
-
-    individual: {
-      qualifying: '',
-      race: '',
-      'parc-ferme': '',
-      intermediate: '',
-    },
-
+    individual: '',
+    intermediate: '',
     pack: '',
   },
 }

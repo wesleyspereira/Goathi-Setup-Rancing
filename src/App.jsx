@@ -7,7 +7,6 @@ import { shop } from './data/shop'
 import heroPoster from './assets/goathi/corrida.jpeg'
 import qualifying from './assets/goathi/qualy-race.jpeg'
 import race from './assets/goathi/corrida.jpeg'
-import parcFerme from './assets/goathi/parc-ferme-foto.jpeg'
 import intermediate from './assets/goathi/intermediario-novo.jpeg'
 import qualifyingArt from './assets/goathi/qualifying.jpg'
 import raceArt from './assets/goathi/race.jpg'
@@ -15,14 +14,28 @@ import parcFermeArt from './assets/goathi/parc-ferme.jpg'
 import intermediateArt from './assets/goathi/intermediario.jpg'
 import logoIMT from './assets/goathi/logo-imt.png'
 import logoRBT from './assets/goathi/logo-rbt.jpeg'
-// Fotos selecionadas conforme as indicações da Goathi.
+// Cada card abre seu próprio tipo de pedido. Preços em src/data/shop.js.
 const products = [
-  { id: 'qualifying', tag: 'F1 26 • QUALIFYING', name: 'Qualifying Setup', description: 'Foco em volta rápida e performance na classificação.', image: qualifying },
-  { id: 'race', tag: 'F1 26 • RACE', name: 'Race Setup', description: 'Equilíbrio e consistência para corridas de longa distância.', image: race },
-  { id: 'parc-ferme', tag: 'F1 26 • PARC FERMÉ', name: 'Parc Fermé Setup', description: 'Configurações para as condições do fim de semana de Grande Prêmio.', image: parcFerme },
-  { id: 'intermediate', tag: 'F1 26 • INTERMEDIÁRIO', name: 'Intermediário Setup', description: 'Ajustes para clima instável e pista molhada.', image: intermediate },
+  {
+    id: 'individual', tag: 'UMA PISTA. SEU OBJETIVO.', name: 'Individual Setup',
+    description: 'Escolha sua pista e prepare o carro para a sua próxima corrida.',
+    image: qualifying, imageAlt: 'Ferrari na pista — setup individual',
+  },
+  {
+    id: 'intermediate', tag: 'CONDIÇÕES DE CHUVA', name: 'Chuva intermediária',
+    description: 'Mais controle na pista molhada, com pneus intermediários de faixa verde.',
+    image: intermediate, imageAlt: 'Ferrari na chuva com pneus intermediários de faixa verde',
+  },
+  {
+    id: 'pack', tag: 'PREPARAÇÃO COMPLETA', name: 'Pack completo',
+    description: 'Quali, Race, Parc Fermé e Condição de Chuva Intermediária em um só pack.',
+    image: race, imageAlt: 'Ferraris na pista — pack completo Goathi',
+  },
 ]
-// As quatro artes aparecem primeiro; as fotos originais continuam na galeria.
+
+const packConfigurations = ['Quali', 'Race', 'Parc Fermé', 'Condição de Chuva Intermediária']
+
+// Mantém somente as quatro artes no carrossel automático.
 const galleryItems = [
   {
     image: qualifyingArt,
@@ -196,7 +209,6 @@ function ThemeToggle({ theme, onToggle }) {
 // O diálogo usa foco nativo, Escape e restauração do foco ao botão de origem.
 function PurchaseDialog({ order, onClose }) {
   const dialog = useRef(null)
-  const [type] = useState(order.product?.id || products[0].id)
   const [circuit, setCircuit] = useState('')
   const [observations, setObservations] = useState('')
   // As 25 pistas informadas pela Goathi; country identifica a bandeira local.
@@ -230,11 +242,12 @@ function PurchaseDialog({ order, onClose }) {
   const trackPickerRef = useRef(null)
   const [trackError, setTrackError] = useState(false)
   const selectedTrack = tracks.find(track => track.name === circuit)
+  // Apenas o individual precisa escolher pista e mostrar bandeiras.
+  const isIndividual = order.kind === 'individual'
   const isPack = order.kind === 'pack'
-  const isCatalog = order.kind === 'catalog'
-  const product = products.find(item => item.id === type)
-  const price = isPack ? shop.prices.pack : isCatalog ? shop.prices.cards : shop.prices.individual
-  const checkoutUrl = isPack ? shop.checkout.pack : isCatalog ? shop.checkout.cards[type] : shop.checkout.individual[type]
+  const product = products.find(item => item.id === order.kind)
+  const price = shop.prices[order.kind]
+  const checkoutUrl = shop.checkout[order.kind]
   const hasCheckout = typeof checkoutUrl === 'string' && checkoutUrl.startsWith('https://')
   useEffect(() => {
     const current = dialog.current
@@ -246,20 +259,22 @@ function PurchaseDialog({ order, onClose }) {
   }, [])
   function sendOrder(event) {
     event.preventDefault()
-    if (!isPack && !selectedTrack) {
+    if (isIndividual && !selectedTrack) {
       setTrackError(true)
       const picker = trackPickerRef.current
       if (picker) { picker.open = true; picker.querySelector('summary')?.focus() }
       return
     }
-    const productName = isPack
-      ? 'Pack Completo Goathi'
-      : isCatalog
-        ? product.name
-        : 'Setup individual'
+    // Um checkout externo recebe apenas a URL configurada; confirme lá a pista.
+    if (hasCheckout) {
+      window.open(checkoutUrl, '_blank', 'noopener,noreferrer')
+      return
+    }
+    const productName = isPack ? 'Pack Completo Goathi' : isIndividual ? 'Setup individual' : 'Condição de Chuva Intermediária'
     const message = [
       `Olá! Quero comprar o ${productName} para F1 26 DLC.`,
-      !isPack ? `Pista: ${circuit}` : '',
+      isIndividual ? `Pista: ${circuit}` : '',
+      isPack ? `Configurações: ${packConfigurations.join(', ')}` : '',
       `Valor: ${money(price)}`,
       !isPack && observations.trim()
         ? `Observações: ${observations.trim()}`
@@ -276,19 +291,25 @@ function PurchaseDialog({ order, onClose }) {
   return <dialog ref={dialog} className="purchase-dialog" aria-labelledby="purchase-title" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) onClose() } }}>
     <button className="dialog-close" type="button" onClick={onClose} aria-label="Fechar pedido" autoFocus>×</button>
     <p className="eyebrow">GOATHI SETUPS • F1 26 DLC</p>
-    <h2 id="purchase-title">{isPack ? 'Pack completo' : isCatalog ? product.name : 'Setup individual'}</h2>
+    <h2 id="purchase-title">{isIndividual ? 'Escolha sua pista' : product.name}</h2>
     <p className="dialog-description">
-      {isPack
-        ? 'Todos os circuitos e todas as configurações disponíveis no pack Goathi.'
-        : isCatalog
-          ? product.description
-          : 'Selecione sua pista e informe suas preferências nas observações.'}
+      {isIndividual
+        ? 'Setup individual: selecione o circuito e informe suas preferências nas observações.'
+        : isPack
+          ? 'Todos os circuitos com as quatro configurações do pack Goathi.'
+          : 'Configurações para chuva intermediária, com foco em controle e consistência na pista molhada.'}
     </p>
-    <p className="order-price">{money(price)}<small>{isPack ? ' / pack' : isCatalog ? ' / setup' : ' / setup individual'}</small></p>
+    {isPack && (
+      <ul className="order-includes" aria-label="Configurações incluídas no pack">
+        {packConfigurations.map(configuration => <li key={configuration}>{configuration}</li>)}
+      </ul>
+    )}
+    {order.kind === 'intermediate' && <p className="rain-detail">Pneus intermediários · faixa verde</p>}
+    <p className="order-price">{money(price)}<small>{isPack ? ' / pack' : isIndividual ? ' / setup individual' : ''}</small></p>
     <form onSubmit={sendOrder}>
       {!isPack && (
         <div className="order-fields">
-          <div className="track-field">
+          {isIndividual && <div className="track-field">
             <span className="track-field-label" id="track-label">Pista</span>
             <details className="track-picker" ref={trackPickerRef}
               onKeyDown={event => {
@@ -321,7 +342,7 @@ function PurchaseDialog({ order, onClose }) {
               </div>
             </details>
             {trackError && <p className="track-error" id="track-error" role="alert">Selecione uma pista para continuar.</p>}
-          </div>
+          </div>}
           <label>
             Observações (opcional)
             <textarea
@@ -334,7 +355,16 @@ function PurchaseDialog({ order, onClose }) {
           </label>
         </div>
       )}
-      {hasCheckout ? <><a className="button primary checkout-button" href={checkoutUrl} target="_blank" rel="noreferrer">IR PARA PAGAMENTO ↗</a><p className="order-note">Confira os itens e, para um setup individual, selecione o circuito na página de pagamento.</p></> : <><button className="button primary checkout-button" type="submit">CONTINUAR PELO WHATSAPP ↗</button><p className="order-note">Seu pedido será enviado à Goathi para confirmar disponibilidade, pagamento e entrega. Nenhuma cobrança é realizada neste site.</p></>}
+      <button className="button primary checkout-button" type="submit">
+        {hasCheckout ? 'IR PARA PAGAMENTO ↗' : 'CONTINUAR PELO WHATSAPP ↗'}
+      </button>
+      <p className="order-note">
+        {hasCheckout
+          ? isIndividual
+            ? 'Confira o produto e confirme o circuito na página de pagamento. Os campos preenchidos aqui não são enviados ao checkout externo.'
+            : 'Confira o produto e o valor na página de pagamento.'
+          : 'Seu pedido será enviado à Goathi para confirmar disponibilidade, pagamento e entrega. Nenhuma cobrança é realizada neste site.'}
+      </p>
     </form>
   </dialog>
 }
@@ -365,15 +395,15 @@ export default function App() {
       <section id="setups" className="catalog container" aria-labelledby="catalog-title">
         <div className="section-heading"><div><p className="eyebrow">ESCOLHA COMO VOCÊ QUER CORRER</p><h2 id="catalog-title">Seu ritmo começa aqui.</h2></div><p>Setups agressivos, precisos e desenvolvidos para performance na pista.</p></div>
         <div className="products">{products.map(product => <article key={product.id} className="product">
-          <div className="product-photo"><img className={`setup-image setup-image--${product.id}`} src={product.image} alt={product.id === 'intermediate' ? 'Ferrari em pista molhada' : `Ferrari na pista — ${product.name}`} loading="lazy" width="800" height="500" /></div>
-          <div className="product-body"><p className="eyebrow">{product.tag}</p><h3>{product.name}</h3><p>{product.description}</p><div className="product-footer"><button type="button" onClick={() => setOrder({ kind: 'catalog', product })} aria-haspopup="dialog" aria-label={'Ver setup: ' + product.name}>VER SETUP ↗</button></div></div>
+          <div className="product-photo"><img className={`setup-image setup-image--${product.id}`} src={product.image} alt={product.imageAlt} loading="lazy" width="800" height="500" /></div>
+          <div className="product-body"><p className="eyebrow">{product.tag}</p><h3>{product.name}</h3><p>{product.description}</p><div className="product-footer"><button type="button" onClick={() => setOrder({ kind: product.id })} aria-haspopup="dialog" aria-label={'Ver setup: ' + product.name}>VER SETUP ↗</button></div></div>
         </article>)}</div>
       </section>
       <section id="pacotes" className="pricing-section" aria-labelledby="pricing-title"><div className="container">
         <div className="section-heading"><div><p className="eyebrow">PREPARAÇÃO QUE VIRA PERFORMANCE</p><h2 id="pricing-title">Escolha sua performance.</h2></div><p>Configure sua próxima corrida com setups para diferentes momentos da pista.</p></div>
         <div className="pricing-grid">
           <article className="price-card"><p className="eyebrow">UMA PISTA. SEU OBJETIVO.</p><h3>Setup individual</h3><p className="price">{money(shop.prices.individual)}<small> / setup</small></p><p>Escolha o circuito e adquira o setup que você precisa.</p><ul><li>Um circuito à sua escolha</li><li>A configuração para seu estilo de corrida</li><li>Foco no seu próximo desafio</li></ul><button className="button primary" type="button" aria-haspopup="dialog" onClick={() => setOrder({ kind: 'individual' })}>COMPRAR SETUP ↗</button></article>
-          <article className="price-card price-card-featured"><span className="value-badge">MAIOR ECONOMIA</span><p className="eyebrow">PRONTO PARA CADA DESAFIO</p><h3>Pack completo</h3><p className="price">{money(shop.prices.pack)}<small> / pack</small></p><p>O conjunto completo de setups disponíveis da Goathi.</p><ul><li>Todos os circuitos</li><li>Todas as configurações disponíveis</li><li>Da classificação à bandeirada</li></ul><button className="button primary" type="button" aria-haspopup="dialog" onClick={() => setOrder({ kind: 'pack' })}>QUERO O PACK COMPLETO ↗</button></article>
+          <article className="price-card price-card-featured"><span className="value-badge">MAIOR ECONOMIA</span><p className="eyebrow">PRONTO PARA CADA DESAFIO</p><h3>Pack completo</h3><p className="price">{money(shop.prices.pack)}<small> / pack</small></p><p>O conjunto completo de setups disponíveis da Goathi.</p><ul><li>Todos os circuitos</li><li>Quali, Race e Parc Fermé</li><li>Condição de Chuva Intermediária</li></ul><button className="button primary" type="button" aria-haspopup="dialog" onClick={() => setOrder({ kind: 'pack' })}>QUERO O PACK COMPLETO ↗</button></article>
         </div>
         <p className="support-line">Dúvidas sobre qual escolher? <a href={`https://wa.me/${shop.whatsapp}`} target="_blank" rel="noreferrer">Fale com a Goathi ↗</a></p>
       </div></section>

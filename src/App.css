@@ -296,9 +296,9 @@ h2 {
 
 .products {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  max-width: 960px;
+  max-width: 1200px;
   margin-inline: auto;
 }
 
@@ -327,7 +327,7 @@ h2 {
   transition: transform .5s;
 }
 
-.setup-image--race {
+.setup-image--pack {
   object-position: center 35%;
 }
 
@@ -1138,7 +1138,7 @@ h2 {
   }
 }
 
-/* Publicações: botão à direita, sem preço no card. */
+/* Publicações: botão centralizado, sem preço no card. */
 .product-footer {
   justify-content: center;
 }
@@ -1455,4 +1455,36 @@ h2 {
   .setup-carousel-slide {
     transition: none;
   }
+}
+/* Conteúdo dos modais de chuva e pack completo. */
+.order-includes {
+  margin: 0 0 24px;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.order-includes li { margin-block: 6px; }
+.order-includes li::marker { color: var(--accent-text); }
+.rain-detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.rain-detail::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #20b15a;
+}
+
+/* Três opções em uma linha no computador; empilhadas no celular. */
+@media (min-width: 641px) and (max-width: 900px) {
+  .catalog .products { gap: 14px; }
+  .catalog .product-body { padding: 18px; }
+  .catalog .product h3 { font-size: 21px; }
 }
