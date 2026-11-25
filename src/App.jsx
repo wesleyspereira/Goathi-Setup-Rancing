@@ -1,163 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { News, useContent } from './admin/Content'
+import { Feedback } from './admin/Feedback'
+import { shop, products, money, promotionActive } from './data/shop'
+import { tracks } from './data/tracks'
 import './App.css'
-import logoWhite from './assets/goathi/logo-branca.png'
-import logoBlack from './assets/goathi/logo-preta.png'
-import wetTrack from './assets/goathi/pista-molhada-nova.jpeg'
-import { shop } from './data/shop'
+import './refinements.css'
+import { Gallery } from './components/Gallery'
 import heroPoster from './assets/goathi/corrida.jpeg'
-import qualifying from './assets/goathi/qualy-race.jpeg'
-import race from './assets/goathi/corrida.jpeg'
-import intermediate from './assets/goathi/intermediario-novo.jpeg'
-import qualifyingArt from './assets/goathi/qualifying.jpg'
-import raceArt from './assets/goathi/race.jpg'
-import parcFermeArt from './assets/goathi/parc-ferme.jpg'
-import intermediateArt from './assets/goathi/intermediario.jpg'
-import logoIMT from './assets/goathi/logo-imt.png'
-import logoRBT from './assets/goathi/logo-rbt.jpeg'
-// Cada card abre seu próprio tipo de pedido. Preços em src/data/shop.js.
-const products = [
-  {
-    id: 'individual', tag: 'UMA PISTA. SEU OBJETIVO.', name: 'Individual Setup',
-    description: 'Escolha sua pista e prepare o carro para a sua próxima corrida.',
-    image: qualifying, imageAlt: 'Ferrari na pista — setup individual',
-  },
-  {
-    id: 'intermediate', tag: 'CONDIÇÕES DE CHUVA', name: 'Chuva intermediária',
-    description: 'Mais controle na pista molhada, com pneus intermediários de faixa verde.',
-    image: intermediate, imageAlt: 'Ferrari na chuva com pneus intermediários de faixa verde',
-  },
-  {
-    id: 'pack', tag: 'PREPARAÇÃO COMPLETA', name: 'Pack completo',
-    description: 'Quali, Race, Parc Fermé e Condição de Chuva Intermediária em um só pack.',
-    image: race, imageAlt: 'Ferraris na pista — pack completo Goathi',
-  },
-]
-
-const packConfigurations = ['Quali', 'Race', 'Parc Fermé', 'Condição de Chuva Intermediária']
-
-// Mantém somente as quatro artes no carrossel automático.
-const galleryItems = [
-  {
-    image: qualifyingArt,
-    title: 'Qualifying Setup',
-    description: 'Foco em volta rápida e mais performance.',
-  },
-  {
-    image: raceArt,
-    title: 'Race Setup',
-    description: 'Equilíbrio e consistência para longa distância.',
-  },
-  {
-    image: parcFermeArt,
-    title: 'Parc Fermé Setup',
-    description: 'Preparação para o fim de semana de Grande Prêmio.',
-  },
-  {
-    image: intermediateArt,
-    title: 'Intermediário Setup',
-    description: 'Controle em clima instável e pista molhada.',
-  },
-]
-function PackageCarousel() {
-  const [index, setIndex] = useState(0)
-  const [visible, setVisible] = useState(false)
-  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-  const carousel = useRef(null)
-  const touchStart = useRef(null)
-  const swiped = useRef(false)
-  const total = galleryItems.length
-  const automatic = !reducedMotion && visible
-  function move(direction) {
-    setIndex(current => (current + direction + total) % total)
-  }
-
-  useEffect(() => {
-    const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReducedMotion(preference.matches)
-    preference.addEventListener('change', update)
-    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting))
-    observer.observe(carousel.current)
-    return () => { preference.removeEventListener('change', update); observer.disconnect() }
-  }, [])
-
-  useEffect(() => {
-    if (!automatic) return
-    const timer = window.setInterval(() => {
-      if (!document.hidden) setIndex(current => (current + 1) % total)
-    }, 5000)
-    return () => window.clearInterval(timer)
-  }, [automatic, total])
-
-  return (
-    <figure ref={carousel} className="setup-carousel" aria-label="Artes e fotos Goathi" aria-roledescription="carrossel"
-      onKeyDown={event => {
-        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-          event.preventDefault()
-          move(event.key === 'ArrowRight' ? 1 : -1)
-        }
-      }}>
-      <div className="setup-carousel-stage"
-        onTouchStart={event => { touchStart.current = event.touches[0].clientX; swiped.current = false }}
-        onTouchEnd={event => {
-          if (touchStart.current === null) return
-          const distance = event.changedTouches[0].clientX - touchStart.current
-          if (Math.abs(distance) > 45) { swiped.current = true; move(distance < 0 ? 1 : -1) }
-          touchStart.current = null
-        }}
-        onTouchCancel={() => { touchStart.current = null }}>
-        {galleryItems.map((item, itemIndex) => {
-          const middle = Math.floor(total / 2)
-          const position = (itemIndex - index + total + middle) % total - middle
-          const distance = Math.abs(position)
-          const active = position === 0
-          return (
-            <a key={item.image} href={item.image} target="_blank" rel="noopener noreferrer"
-              className={`setup-carousel-slide ${active ? 'is-active' : ''}`}
-              data-position={position} data-hidden={distance > 2}
-              style={{ '--shift': `${Math.sign(position) * (distance === 1 ? 64 : distance >= 2 ? 95 : 0)}%`, '--angle': `${Math.sign(position) * (distance === 1 ? 50 : distance >= 2 ? 72 : 0)}deg`, '--distance': distance, zIndex: total - distance }}
-              tabIndex={active ? 0 : -1} aria-hidden={!active}
-              aria-label={`Ampliar ${item.title}`}
-              onClick={event => {
-                if (swiped.current) { event.preventDefault(); swiped.current = false; return }
-                if (!active) { event.preventDefault(); setIndex(itemIndex) }
-              }}>
-              {/* Fundo que preenche as laterais */}
-              <img
-                className="carousel-image-bg"
-                src={item.image}
-                alt=""
-                aria-hidden="true"
-                loading="lazy"
-                draggable={false}
-              />
-
-              {/* Imagem principal, inteira */}
-              <img
-                className="carousel-image-main"
-                src={item.image}
-                alt={item.title}
-                loading="lazy"
-                draggable={false}
-              />
-            </a>
-          )
-        })}
-      </div>
-      <div className="setup-carousel-controls">
-        <button type="button" onClick={() => move(-1)} aria-label="Imagem anterior">‹ <span>Anterior</span></button>
-        <span className="setup-carousel-count">{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
-        <button type="button" onClick={() => move(1)} aria-label="Próxima imagem"><span>Próxima</span> ›</button>
-       
-      </div>
-      <figcaption aria-live={automatic ? 'off' : 'polite'} aria-atomic="true">
-        <strong>{galleryItems[index].title}</strong>
-        <span>{galleryItems[index].description}</span>
-      </figcaption>
-      <p className="setup-carousel-hint">Selecione uma lateral para girar. Toque na imagem central para ampliar.</p>
-    </figure>
-  )
-}
-
+const base = import.meta.env.BASE_URL
+const asset = path => window.GOATHI_PREVIEW_ASSETS?.[path] || `${base}${path}`
 function RaceBanner() {
   const video = useRef(null)
   const [unavailable, setUnavailable] = useState(false)
@@ -183,301 +34,56 @@ function RaceBanner() {
     preference.addEventListener('change', stopIfReduced)
     return () => { preference.removeEventListener('change', stopIfReduced); observer.disconnect() }
   }, [])
-  return <section className="hero hero-hover" aria-labelledby="hero-title"
+  return <section className="race-hero hero-hover" aria-labelledby="hero-title"
     onMouseEnter={startMotion} onMouseLeave={stopMotion}
     onFocus={startMotion}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) stopMotion() }}
   >
-    <video ref={video} className="hero-video" src={`${import.meta.env.BASE_URL}videos/corrida.mp4`} muted loop playsInline preload="metadata" poster={heroPoster} onLoadedData={() => setUnavailable(false)} aria-hidden="true" onError={() => setUnavailable(true)} />
-    <div className="hero-shade" />
-    <div className="hero-content container">
+    <video ref={video} className="race-background hero-video" src={window.GOATHI_PREVIEW_VIDEO || `${import.meta.env.BASE_URL}videos/corrida.mp4`} muted loop playsInline preload="metadata" poster={heroPoster} onLoadedData={() => setUnavailable(false)} aria-hidden="true" onError={() => setUnavailable(true)} />
+    <div className="race-shade" />
+    <div className="race-content container">
       <p className="eyebrow"><span /> GOATHI SETUPS • F1 26 DLC</p>
       <h1 id="hero-title">A próxima volta<br /><em>O seu melhor</em></h1>
       <p className="hero-description">Setups desenvolvidos para extrair mais performance do seu carro no F1 26.</p>
-      <div className="hero-actions"><a className="button primary" href="#setups">ENCONTRAR MEU SETUP <span aria-hidden="true">↗</span></a><a className="button secondary" href="#sobre">CONHECER A GOATHI</a></div>
+      <div className="hero-actions"><a className="btn" href="#produtos">ENCONTRAR MEU SETUP <span aria-hidden="true">↗</span></a><a className="btn btn--ghost" href="#sobre">CONHECER A GOATHI</a></div>
     </div>
     <div className="hero-bottom container"><span>PRECISÃO EM CADA CURVA</span>{unavailable && <span className="video-note">Vídeo indisponível</span>}</div>
   </section>
 }
-const money = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
-function ThemeToggle({ theme, onToggle }) {
-  return <button className="theme-toggle" type="button" onClick={onToggle} aria-label={`Ativar tema ${theme === 'dark' ? 'claro' : 'escuro'}`} title={`Ativar tema ${theme === 'dark' ? 'claro' : 'escuro'}`}>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">{theme === 'dark' ? <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></> : <path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z" />}</svg>
-    <span>{theme === 'dark' ? 'Claro' : 'Escuro'}</span>
-  </button>
-}
-// O diálogo usa foco nativo, Escape e restauração do foco ao botão de origem.
-function PurchaseDialog({ order, onClose }) {
-  const dialog = useRef(null)
-  const [circuit, setCircuit] = useState('')
-  const [observations, setObservations] = useState('')
-  // As 25 pistas informadas pela Goathi; country identifica a bandeira local.
-  const tracks = [
-    { country: 'au', name: 'Austrália — Albert Park' },
-    { country: 'cn', name: 'China — Shanghai International Circuit' },
-    { country: 'jp', name: 'Japão — Suzuka' },
-    { country: 'bh', name: 'Bahrein — Bahrain International Circuit' },
-    { country: 'sa', name: 'Arábia Saudita — Jeddah Corniche Circuit' },
-    { country: 'us', name: 'Miami — Miami International Autodrome' },
-    { country: 'ca', name: 'Canadá — Circuit Gilles-Villeneuve' },
-    { country: 'mc', name: 'Mônaco — Circuit de Monaco' },
-    { country: 'es', name: 'Barcelona — Circuit de Barcelona-Catalunya' },
-    { country: 'at', name: 'Áustria — Red Bull Ring' },
-    { country: 'gb', name: 'Grã-Bretanha — Silverstone' },
-    { country: 'be', name: 'Bélgica — Spa-Francorchamps' },
-    { country: 'hu', name: 'Hungria — Hungaroring' },
-    { country: 'nl', name: 'Holanda — Zandvoort' },
-    { country: 'it', name: 'Itália — Monza' },
-    { country: 'es', name: 'Espanha — MADRING (Madrid)' },
-    { country: 'az', name: 'Azerbaijão — Baku City Circuit' },
-    { country: 'sg', name: 'Singapura — Marina Bay' },
-    { country: 'us', name: 'EUA — Circuit of the Americas (Austin)' },
-    { country: 'mx', name: 'México — Autódromo Hermanos Rodríguez' },
-    { country: 'br', name: 'Brasil — Interlagos' },
-    { country: 'us', name: 'Las Vegas — Las Vegas Strip Circuit' },
-    { country: 'qa', name: 'Qatar — Lusail' },
-    { country: 'ae', name: 'Abu Dhabi — Yas Marina' },
-    { country: 'it', name: 'Imola — Autodromo Enzo e Dino Ferrari' },
-  ]
-  const trackPickerRef = useRef(null)
-  const [trackError, setTrackError] = useState(false)
-  const selectedTrack = tracks.find(track => track.name === circuit)
-  // Apenas o individual precisa escolher pista e mostrar bandeiras.
-  const isIndividual = order.kind === 'individual'
-  const isPack = order.kind === 'pack'
-  const product = products.find(item => item.id === order.kind)
-  const price = shop.prices[order.kind]
-  const checkoutUrl = shop.checkout[order.kind]
-  const hasCheckout = typeof checkoutUrl === 'string' && checkoutUrl.startsWith('https://')
+
+function Purchase({ product, price, close }) {
+  const ref = useRef(null), [circuit, setCircuit] = useState(''), [notes, setNotes] = useState('')
   useEffect(() => {
-    const current = dialog.current
-    const trigger = document.activeElement
-    current.showModal()
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { current.close(); document.body.style.overflow = previousOverflow; trigger?.focus() }
+    const trigger = document.activeElement, overflow = document.body.style.overflow
+    ref.current.showModal(); document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = overflow; trigger?.focus() }
   }, [])
-  function sendOrder(event) {
-    event.preventDefault()
-    if (isIndividual && !selectedTrack) {
-      setTrackError(true)
-      const picker = trackPickerRef.current
-      if (picker) { picker.open = true; picker.querySelector('summary')?.focus() }
-      return
-    }
-    // Um checkout externo recebe apenas a URL configurada; confirme lá a pista.
-    if (hasCheckout) {
-      window.open(checkoutUrl, '_blank', 'noopener,noreferrer')
-      return
-    }
-    const productName = isPack ? 'Pack Completo Goathi' : isIndividual ? 'Setup individual' : 'Condição de Chuva Intermediária'
-    const message = [
-      `Olá! Quero comprar o ${productName} para F1 26 DLC.`,
-      isIndividual ? `Pista: ${circuit}` : '',
-      isPack ? `Configurações: ${packConfigurations.join(', ')}` : '',
-      `Valor: ${money(price)}`,
-      !isPack && observations.trim()
-        ? `Observações: ${observations.trim()}`
-        : '',
-    ]
-      .filter(Boolean)
-      .join('\n')
-    window.open(
-      `https://wa.me/${shop.whatsapp}?text=${encodeURIComponent(message)}`,
-      '_blank',
-      'noopener,noreferrer'
-    )
+  function submit(e) {
+    e.preventDefault()
+    const checkout = shop.checkout[product.id]
+    if (checkout && price != null) { window.open(checkout, '_blank', 'noopener,noreferrer'); return }
+    const message = [`Olá, Goathi! Quero adquirir ${product.name}.`, `Valor: ${money(price)}`, circuit && `Pista: ${circuit}`, notes && `Observações: ${notes}`].filter(Boolean).join('\n')
+    window.open(`https://wa.me/${shop.whatsapp}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
   }
-  return <dialog ref={dialog} className="purchase-dialog" aria-labelledby="purchase-title" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) onClose() } }}>
-    <button className="dialog-close" type="button" onClick={onClose} aria-label="Fechar pedido" autoFocus>×</button>
-    <p className="eyebrow">GOATHI SETUPS • F1 26 DLC</p>
-    <h2 id="purchase-title">{isIndividual ? 'Escolha sua pista' : product.name}</h2>
-    <p className="dialog-description">
-      {isIndividual
-        ? 'Setup individual: selecione o circuito e informe suas preferências nas observações.'
-        : isPack
-          ? 'Todos os circuitos com as quatro configurações do pack Goathi.'
-          : 'Configurações para chuva intermediária, com foco em controle e consistência na pista molhada.'}
-    </p>
-    {isPack && (
-      <ul className="order-includes" aria-label="Configurações incluídas no pack">
-        {packConfigurations.map(configuration => <li key={configuration}>{configuration}</li>)}
-      </ul>
-    )}
-    {order.kind === 'intermediate' && <p className="rain-detail">Pneus intermediários · faixa verde</p>}
-    <p className="order-price">{money(price)}<small>{isPack ? ' / pack' : isIndividual ? ' / setup individual' : ''}</small></p>
-    <form onSubmit={sendOrder}>
-      {!isPack && (
-        <div className="order-fields">
-          {isIndividual && <div className="track-field">
-            <span className="track-field-label" id="track-label">Pista</span>
-            <details className="track-picker" ref={trackPickerRef}
-              onKeyDown={event => {
-                if (event.key === 'Escape' && event.currentTarget.open) {
-                  event.preventDefault()
-                  event.stopPropagation()
-                  event.currentTarget.open = false
-                  event.currentTarget.querySelector('summary')?.focus()
-                }
-              }}>
-              <summary aria-labelledby="track-label track-value" aria-invalid={trackError}
-                aria-describedby={trackError ? 'track-error' : undefined}>
-                {selectedTrack && <img className="track-flag" src={`${import.meta.env.BASE_URL}flags/${selectedTrack.country}.png`} alt="" width="28" height="20" />}
-                <span id="track-value">{selectedTrack?.name || 'Selecione uma pista'}</span>
-                <span className="track-chevron" aria-hidden="true">▾</span>
-              </summary>
-              <div className="track-options" role="group" aria-label="Pistas disponíveis">
-                {tracks.map(track => (
-                  <button key={track.name} type="button" className="track-option" aria-pressed={circuit === track.name}
-                    onClick={() => {
-                      setCircuit(track.name)
-                      setTrackError(false)
-                      const picker = trackPickerRef.current
-                      if (picker) { picker.open = false; picker.querySelector('summary')?.focus() }
-                    }}>
-                    <img className="track-flag" src={`${import.meta.env.BASE_URL}flags/${track.country}.png`} alt="" width="28" height="20" loading="lazy" />
-                    <span>{track.name}</span>
-                  </button>
-                ))}
-              </div>
-            </details>
-            {trackError && <p className="track-error" id="track-error" role="alert">Selecione uma pista para continuar.</p>}
-          </div>}
-          <label>
-            Observações (opcional)
-            <textarea
-              value={observations}
-              onChange={event => setObservations(event.target.value)}
-              placeholder="Ex.: prefiro um carro mais estável nas curvas."
-              rows={2}
-              maxLength={500}
-            />
-          </label>
-        </div>
-      )}
-      <button className="button primary checkout-button" type="submit">
-        {hasCheckout ? 'IR PARA PAGAMENTO ↗' : 'CONTINUAR PELO WHATSAPP ↗'}
-      </button>
-      <p className="order-note">
-        {hasCheckout
-          ? isIndividual
-            ? 'Confira o produto e confirme o circuito na página de pagamento. Os campos preenchidos aqui não são enviados ao checkout externo.'
-            : 'Confira o produto e o valor na página de pagamento.'
-          : 'Seu pedido será enviado à Goathi para confirmar disponibilidade, pagamento e entrega. Nenhuma cobrança é realizada neste site.'}
-      </p>
-    </form>
-  </dialog>
+  return <dialog ref={ref} className="purchase-dialog" aria-labelledby="purchase-title" onCancel={close}><button className="close-dialog" onClick={close} aria-label="Fechar pedido">Fechar</button><p className="eyebrow">SEU PEDIDO</p><h2 id="purchase-title">{product.name}</h2><p className="price">{money(price)}</p><form onSubmit={submit}>{product.id === 'individual' && <label>Circuito<select required value={circuit} onChange={e => setCircuit(e.target.value)}><option value="">Selecione uma pista</option>{tracks.map(t => <option key={t.name}>{t.name}</option>)}</select></label>}<label>Observações (opcional)<textarea maxLength={1000} value={notes} onChange={e => setNotes(e.target.value)} /></label><p>Confirme disponibilidade, pagamento e entrega com a Goathi. Nenhuma cobrança é realizada nesta página.</p><button className="btn" type="submit">Continuar compra</button></form></dialog>
 }
 export default function App() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [order, setOrder] = useState(null)
-  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'dark')
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#090A0C' : '#F5F5F5')
-    try { localStorage.setItem('goathi-theme', theme) } catch { /* Navegação com armazenamento desativado. */ }
-  }, [theme])
-  useEffect(() => {
-    const closeMenu = event => { if (event.key === 'Escape') setMenuOpen(false) }
-    document.addEventListener('keydown', closeMenu)
-    return () => document.removeEventListener('keydown', closeMenu)
-  }, [])
-  const logo = theme === 'dark' ? logoWhite : logoBlack
-  return <>
-    <a href="#main" className="skip-link">Pular para o conteúdo</a>
-    <header className="header"><div className="container navigation">
-      <a className="brand" href="#" aria-label="Goathi Setups — início"><img className="brand-logo" src={logo} alt="Goathi Setups" /></a>
-      <nav id="main-menu" className={menuOpen ? 'nav open' : 'nav'} aria-label="Menu principal"><a href="#setups" onClick={() => setMenuOpen(false)}>Setups</a><a href="#pacotes" onClick={() => setMenuOpen(false)}>Pacotes</a><a href="#sobre" onClick={() => setMenuOpen(false)}>Sobre</a><a href="#contato" onClick={() => setMenuOpen(false)}>Contato</a><a className="nav-cta" href="#setups" onClick={() => setMenuOpen(false)}>VER SETUPS ↗</a></nav>
-      <div className="header-actions"><ThemeToggle theme={theme} onToggle={() => setTheme(current => current === 'dark' ? 'light' : 'dark')} /><button className="menu-toggle" aria-expanded={menuOpen} aria-controls="main-menu" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? 'Fechar' : 'Menu'}</button></div>
-    </div></header>
-    <main id="main"><RaceBanner />
-      <div className="racing-strip"><div className="container"><span>F1 26 DLC</span><span>QUALIFYING</span><span>RACE</span><span>PARC FERMÉ</span><span>INTERMEDIÁRIO</span></div></div>
-      <section id="setups" className="catalog container" aria-labelledby="catalog-title">
-        <div className="section-heading"><div><p className="eyebrow">ESCOLHA COMO VOCÊ QUER CORRER</p><h2 id="catalog-title">Seu ritmo começa aqui.</h2></div><p>Setups agressivos, precisos e desenvolvidos para performance na pista.</p></div>
-        <div className="products">{products.map(product => <article key={product.id} className="product">
-          <div className="product-photo"><img className={`setup-image setup-image--${product.id}`} src={product.image} alt={product.imageAlt} loading="lazy" width="800" height="500" /></div>
-          <div className="product-body"><p className="eyebrow">{product.tag}</p><h3>{product.name}</h3><p>{product.description}</p><div className="product-footer"><button type="button" onClick={() => setOrder({ kind: product.id })} aria-haspopup="dialog" aria-label={'Ver setup: ' + product.name}>VER SETUP ↗</button></div></div>
-        </article>)}</div>
-      </section>
-      <section id="pacotes" className="pricing-section" aria-labelledby="pricing-title"><div className="container">
-        <div className="section-heading"><div><p className="eyebrow">PREPARAÇÃO QUE VIRA PERFORMANCE</p><h2 id="pricing-title">Escolha sua performance.</h2></div><p>Configure sua próxima corrida com setups para diferentes momentos da pista.</p></div>
-        <div className="pricing-grid">
-          <article className="price-card"><p className="eyebrow">UMA PISTA. SEU OBJETIVO.</p><h3>Setup individual</h3><p className="price">{money(shop.prices.individual)}<small> / setup</small></p><p>Escolha o circuito e adquira o setup que você precisa.</p><ul><li>Um circuito à sua escolha</li><li>A configuração para seu estilo de corrida</li><li>Foco no seu próximo desafio</li></ul><button className="button primary" type="button" aria-haspopup="dialog" onClick={() => setOrder({ kind: 'individual' })}>COMPRAR SETUP ↗</button></article>
-          <article className="price-card price-card-featured"><span className="value-badge">MAIOR ECONOMIA</span><p className="eyebrow">PRONTO PARA CADA DESAFIO</p><h3>Pack completo</h3><p className="price">{money(shop.prices.pack)}<small> / pack</small></p><p>O conjunto completo de setups disponíveis da Goathi.</p><ul><li>Todos os circuitos</li><li>Quali, Race e Parc Fermé</li><li>Condição de Chuva Intermediária</li></ul><button className="button primary" type="button" aria-haspopup="dialog" onClick={() => setOrder({ kind: 'pack' })}>QUERO O PACK COMPLETO ↗</button></article>
-        </div>
-        <p className="support-line">Dúvidas sobre qual escolher? <a href={`https://wa.me/${shop.whatsapp}`} target="_blank" rel="noreferrer">Fale com a Goathi ↗</a></p>
-      </div></section>
-      <section className="manifesto container" aria-label="Manifesto Goathi"><p className="eyebrow">CADA AJUSTE CONTA.</p><h2>PERFORMANCE<br />IS <span>BUILT.</span></h2><p>Performance não acontece por acaso.<br />Ela é construída em cada ajuste, cada curva e cada volta.</p></section>
-      <section id="sobre" className="about container" aria-labelledby="about-title"><div className="about-copy"><p className="eyebrow">DA PRIMEIRA VOLTA À BANDEIRADA</p><h2 id="about-title">Performance construída para a pista.</h2><p>A Goathi Setups nasceu para transformar preparação em performance.</p><p>Desenvolvemos setups para F1 26 com foco em velocidade, equilíbrio e consistência — da classificação à bandeirada.</p><a className="text-link" href="https://www.instagram.com/goathisetups/" target="_blank" rel="noreferrer">ACOMPANHE A GOATHI ↗</a></div><figure className="about-photo"><img src={wetTrack} alt="Ferrari contornando uma curva na pista molhada" loading="lazy" /><figcaption>VELOCIDADE. CONTROLE. CONSISTÊNCIA.</figcaption></figure></section>
-      <section className="brand-materials container" aria-labelledby="materials-title"><div className="materials-grid"><div className="gallery-copy"><p className="eyebrow">GOATHI SETUPS • F1 26 DLC</p><h2 id="materials-title">Cada condição.<br />Uma nova volta.</h2><p>Quatro configurações. Um objetivo: extrair mais do carro.</p><div className="setup-tags"><span>Qualifying</span><span>Race</span><span>Parc Fermé</span><span>Intermediário</span></div><a className="button primary" href="#pacotes">ESCOLHER MEU SETUP ↗</a></div><PackageCarousel /></div></section>
-      <section id="contato" className="contact container" aria-labelledby="contact-title"><div className="contact-copy"><p className="eyebrow">SUA PRÓXIMA VOLTA COMEÇA AQUI</p><h2 id="contact-title">Pronto para ir além?</h2><p>Escolha seu setup e prepare sua próxima corrida. Para dúvidas e novidades, fale com a Goathi ou acompanhe nosso Instagram.</p><a className="text-link" href="#pacotes">VER PRODUTOS E PREÇOS ↗</a></div>
-        <div className="contact-links">
-          <a className="contact-link" href="https://wa.me/5527996452596" target="_blank" rel="noreferrer" aria-label="Falar com a Goathi Setups pelo WhatsApp">
-            <span className="contact-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="img"><path fill="currentColor" d="M19.1 4.9A9.8 9.8 0 0 0 3.7 16.7L2.3 22l5.4-1.4A9.8 9.8 0 0 0 22 11.9a9.7 9.7 0 0 0-2.9-7Zm-7 15.3a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3.2.9.9-3.1-.2-.3A8.1 8.1 0 1 1 12.1 20.2Zm4.4-6.1c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.6.1-.2.2-.6.8-.8.9-.1.2-.3.2-.5.1-1.4-.7-2.4-1.3-3.3-2.9-.2-.3.2-.3.7-1 .1-.1.1-.3 0-.5l-.7-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.4.2 1.9.1.6-.1 1.4-.6 1.6-1.1.2-.5.2-1 .2-1.1-.1-.1-.2-.2-.5-.3Z" /></svg>
-            </span>
-          </a>
-          <a className="contact-link" href="https://www.instagram.com/goathisetups/" target="_blank" rel="noreferrer" aria-label="Abrir Instagram da Goathi Setups">
-            <span className="contact-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="img"><path fill="currentColor" d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6Zm9.7 1.5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" /></svg>
-            </span>
-          </a>
-        </div>
-      </section>
-    </main>
-    <footer className="site-footer">
-      <section
-        className="partners container"
-        aria-labelledby="partners-title"
-      >
-        <p className="eyebrow">JUNTOS NA PISTA</p>
-        <h2 id="partners-title">Nossos parceiros.</h2>
-        <div className="partners-grid">
-          <article className="partner partner-main">
-            <span className="partner-label">
-              PARCEIRO PRINCIPAL
-            </span>
-            <div className="partner-logo">
-              <img
-                src={logoIMT}
-                alt="IMT — IronX E-Sports"
-                loading="lazy"
-              />
-            </div>
-            <h3>IMT — IronX E-Sports</h3>
-          </article>
-          <article className="partner">
-            <span className="partner-label">PARCEIRO</span>
-            <div className="partner-logo">
-              <img
-                src={logoRBT}
-                alt="RBT — Racing Brazil Team"
-                loading="lazy"
-              />
-            </div>
-            <h3>RBT — Racing Brazil Team</h3>
-          </article>
-        </div>
-      </section>
-      <div className="container footer">
-        <a
-          className="brand"
-          href="#"
-          aria-label="Goathi Setups — início"
-        >
-          <img
-            className="brand-logo"
-            src={logo}
-            alt="Goathi Setups"
-          />
-        </a>
-        <p>
-          © {new Date().getFullYear()} Goathi Setups
-          F1 26 DLC • GOATHI SETUPS
-        </p>
-        <span>PERFORMANCE IS BUILT.</span>
-      </div>
-    </footer>
-    {order && <PurchaseDialog order={order} onClose={() => setOrder(null)} />}
-  </>
+  const { prices, promotion } = useContent()
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme === 'claro' ? 'claro' : 'escuro')
+  const [pdfTheme, setPdfTheme] = useState('escuro'), [order, setOrder] = useState(null), [menu, setMenu] = useState(false), [now, setNow] = useState(Date.now())
+  useEffect(() => { document.documentElement.dataset.theme = theme; document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'claro' ? '#F4F2EC' : '#0E0E10'); try { localStorage.setItem('goathi-theme', theme) } catch {} }, [theme])
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer) }, [])
+  const offer = promotionActive(promotion, now)
+  const logo = asset(`logos/logo_goathi_para-fundo-${theme === 'claro' ? 'claro' : 'escuro'}.png`)
+  return <><a className="skip-link" href="#main">Pular para o conteúdo</a><header className="site-header"><div className="container navigation"><a href="#" aria-label="Goathi Setups início"><img className="brand-logo" src={logo} alt="Goathi Setups" /></a><button className="mobile-menu" aria-controls="navigation" aria-expanded={menu} onClick={() => setMenu(!menu)}>Menu</button><nav id="navigation" className={menu ? 'open' : ''}>{[['produtos','Produtos'],['previas','Prévias'],['novidades','Novidades'],['feedbacks','Feedbacks'],['contato','Contato']].map(([id,label]) => <a href={`#${id}`} key={id} onClick={() => setMenu(false)}>{label}</a>)}</nav><button className="theme-button" onClick={() => setTheme(theme === 'claro' ? 'escuro' : 'claro')} aria-label={`Ativar tema ${theme === 'claro' ? 'escuro' : 'off-white'}`}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">{theme === 'claro' ? <path d="M20.5 14A9 9 0 0 1 10 3.5 9 9 0 1 0 20.5 14Z" /> : <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></>}</svg></button></div></header>
+  <main id="main"><RaceBanner />
+  <section id="produtos" className="container section"><p className="eyebrow">QUATRO FORMAS DE SE PREPARAR</p><h2>Escolha sua <em>performance.</em></h2><div className="product-grid">{products.map(p => <article key={p.id} className={`card product-card ${p.id === 'pro' ? 'card--red' : ''}`}><div className="badge-slot">{p.badge && <span className="pill">{p.badge}</span>}</div><h3>{p.name}</h3><p className="summary">{p.summary}</p><p className="price">{money(prices[p.id])}</p><ul>{p.details.map(d => <li key={d}>{d}</li>)}</ul><button className="btn" onClick={() => setOrder(p)}>Escolher {p.name}</button></article>)}</div><p className="muted">Todos os PDFs incluem os temas escuro e off-white. Atualizações dos setups continuam gratuitas para clientes.</p></section>
+  {offer && <section className="container upgrade"><div><p className="eyebrow">CONDIÇÃO PARA CLIENTES</p><h2>Já tem o <em>Pack?</em></h2><p>Adquira o novo ERS + Estratégia por <strong>{money(promotion.price)}</strong> <span>(de {money(prices.ers)})</span>, até {promotion.endDate.split('-').reverse().join('/')}.</p><p className="muted">Envie seu comprovante pelo direct para confirmar a condição.</p></div><a className="btn" href="https://www.instagram.com/goathisetups/" target="_blank" rel="noreferrer">Solicitar pelo Instagram</a></section>}
+  <section className="container section"><p className="eyebrow">COMPARE OS CONTEÚDOS</p><h2>Produtos e <em>valores.</em></h2><div className="table-wrap"><table><caption>Catálogo Goathi Setups — F1 26 DLC</caption><thead><tr><th scope="col">Produto</th><th scope="col">Conteúdo</th><th scope="col">Valor</th></tr></thead><tbody>{products.map(p => <tr key={p.id}><th scope="row">{p.name}</th><td>{p.summary} {p.details[0]}</td><td className="price-cell">{money(prices[p.id])}</td></tr>)}</tbody></table></div></section>
+  <section id="previas" className="container section"><p className="eyebrow">EXEMPLO · ÁUSTRIA</p><div className="section-heading"><h2>Conheça nossos <em>setups.</em></h2><div className="theme-options" aria-label="Tema das prévias">{['escuro','claro'].map(t => <button key={t} aria-pressed={pdfTheme === t} onClick={() => setPdfTheme(t)}>{t === 'claro' ? 'Off-white' : 'Escuro'}</button>)}</div></div><div className="preview-grid">{[1,2].map(n => <figure className="card" key={n}><a href={asset(`previews-pdf/exemplo-austria_pagina${n}_${pdfTheme}.jpg`)} target="_blank" rel="noreferrer"><img src={asset(`previews-pdf/exemplo-austria_pagina${n}_${pdfTheme}.webp`)} alt={`Prévia Áustria, página ${n}: ${n === 1 ? 'setups' : 'ERS e estratégia'}, tema ${pdfTheme}`} loading="lazy" /></a><figcaption>Página {n} · {n === 1 ? 'Setups' : 'ERS + Estratégia'} — clique para ampliar</figcaption></figure>)}</div></section>
+  <section className="container section"><p className="eyebrow">DA ESCOLHA À PISTA</p><h2>Como <em>comprar.</em></h2><div className="steps">{[['Escolha o produto','Selecione o conteúdo desejado. No avulso, escolha também o circuito.'],['Confirme seu pedido','Continue pelo WhatsApp para combinar pagamento e entrega com a Goathi.'],['Receba seus PDFs','Acesse o material por pista nos dois temas e prepare sua próxima corrida.']].map(([title,text],i) => <article className="card" key={title}><span className="step-number">0{i+1}</span><h3>{title}</h3><p>{text}</p></article>)}</div></section>
+  <section id="sobre" className="container section about about-layout"><div className="about-copy"><p className="eyebrow">DA PRIMEIRA VOLTA À BANDEIRADA</p><h2>Performance construída<br />para a pista.</h2><p>A Goathi Setups nasceu para transformar preparação em performance.</p><p>Desenvolvemos setups para F1 26 com foco em velocidade, equilíbrio e consistência — da classificação à bandeirada.</p><a className="about-follow" href="https://www.instagram.com/goathisetups/" target="_blank" rel="noreferrer">ACOMPANHE A GOATHI <span aria-hidden="true">↗</span></a></div><Gallery /></section><News /><Feedback />
+  <section className="container section faq"><p className="eyebrow">DÚVIDAS FREQUENTES</p><h2>Antes da <em>largada.</em></h2>{[['O que vem no Individual Setup?','Quatro setups de uma pista: Qualifying, Race, Parc Fermé e Intermediate.'],['ERS + Estratégia é uma atualização?','É um produto novo, vendido separadamente ou junto dos setups no Pack Pro.'],['As atualizações dos setups continuam gratuitas?','Sim. As atualizações dos setups continuam gratuitas para quem já comprou.'],['Como funciona o Pack Pro?','São 25 pistas, com um PDF por pista: setups na página 1 e ERS e estratégia na página 2. Os PDFs vêm nos temas escuro e off-white.']].map(([q,a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</section>
+  <section id="contato" className="container section contact"><p className="eyebrow">FALE COM A GOATHI</p><h2>Sua próxima <em>corrida.</em></h2><p>Dúvidas sobre os produtos, condições e entrega? Fale com a equipe.</p><div className="actions"><a className="social-icon" href={`https://wa.me/${shop.whatsapp}`} target="_blank" rel="noreferrer" aria-label="Falar com a Goathi pelo WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.5 11.6a8.6 8.6 0 0 1-12.7 7.6L3 20.5l1.3-4.7a8.6 8.6 0 1 1 16.2-4.2Z"/><path d="M8.1 7.5c.3-.3.8-.2 1 .2l.9 1.8c.1.3.1.5-.1.7l-.7.7c.7 1.5 1.8 2.6 3.4 3.3l.7-.8c.2-.2.5-.3.8-.1l1.8.9c.4.2.4.6.2 1-1 1.6-2.9 1.1-5.1-.3-2.1-1.4-3.5-3.4-3.7-5.3-.1-.9.3-1.6.8-2.1Z"/></svg></a><a className="social-icon" href="https://www.instagram.com/goathisetups/" target="_blank" rel="noreferrer" aria-label="Abrir Instagram da Goathi" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a></div></section></main>
+  <footer className="container footer"><img className="brand-logo" src={logo} alt="Goathi Setups" /><p>© {new Date().getFullYear()} Goathi Setups · F1 26 DLC</p></footer>{order && <Purchase product={order} price={prices[order.id]} close={() => setOrder(null)} />}</>
 }

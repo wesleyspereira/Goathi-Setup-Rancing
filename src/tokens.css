@@ -1,0 +1,22 @@
+/* Goathi Setups · design tokens · fonte: Montserrat (300–900) via Google Fonts */
+:root{
+  --red:#F80102;
+  /* tema escuro (padrão) */
+  --bg:#0E0E10; --bg-2:#151518; --card:#1A1A1D; --line:#2C2C31;
+  --text:#F5F3EE; --muted:#9A9AA0;
+  --radius-card:22px; --radius-btn:16px;
+}
+:root[data-theme="claro"]{
+  --bg:#F4F2EC; --bg-2:#ECE9E1; --card:#FFFFFF; --line:#E3E0D8;
+  --text:#151515; --muted:#6B6B66;
+}
+body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-weight:800;line-height:1.02;letter-spacing:-.02em}      /* títulos: bold, sentence case, 1 palavra em vermelho */
+.eyebrow{font-weight:800;letter-spacing:.32em;text-transform:uppercase;color:var(--red);font-size:.75rem}
+.muted{color:var(--muted);font-weight:500}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius-card)}
+.card--red{background:var(--red);border-color:var(--red);color:#fff}
+.btn{background:var(--red);color:#fff;font-weight:800;letter-spacing:.14em;text-transform:uppercase;border-radius:var(--radius-btn);padding:1.1em 2em}
+.btn--ghost{background:transparent;border:2px solid var(--red);color:var(--text)}
+.pill{background:var(--red);color:#fff;font-weight:800;letter-spacing:.14em;border-radius:999px;padding:.45em 1.1em}
+.hero-glow{background:radial-gradient(circle at 80% 20%,rgba(248,1,2,.22),transparent 55%)}

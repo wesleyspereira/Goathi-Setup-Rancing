@@ -1,24 +1,18 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="escuro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#090A0C" />
-  <meta name="description" content="Goathi Setups: setups para F1 26 DLC. Qualifying, Race, Parc Fermé e Intermediário. Setup individual por R$ 6,90 e pack completo por R$ 79,90." />
-  <title>Goathi Setups | Performance is built.</title>
-  <link rel="icon" type="image/png" href="./favicon.png?v=2" />
-  <script>
-    // Aplica o tema salvo antes da pintura para evitar o flash de cor.
-    try {
-      var savedTheme = localStorage.getItem('goathi-theme');
-      var initialTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-      document.documentElement.dataset.theme = initialTheme;
-      document.querySelector('meta[name="theme-color"]').setAttribute('content', initialTheme === 'light' ? '#F5F5F5' : '#090A0C');
-    } catch (error) { /* O tema escuro funciona mesmo sem armazenamento. */ }
-  </script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="./src/main.jsx"></script>
-</body>
-</html>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Goathi Setups | Performance is built.</title>
+<meta name="description" content="Goathi Setups: setups, mapa de ERS e estratégia de corrida para o F1 26 DLC. Conheça Setup avulso, Pack Setups, ERS + Estratégia e Pack Pro, em PDFs nos temas escuro e off-white." />
+<meta name="theme-color" content="#0E0E10" />
+<link rel="canonical" href="https://www.goathisetups.com/" />
+<meta property="og:type" content="website" /><meta property="og:locale" content="pt_BR" />
+<meta property="og:title" content="Goathi Setups | Performance is built." />
+<meta property="og:description" content="Setups, ERS e estratégia para F1 26 DLC. Conheça os quatro produtos Goathi e prepare sua próxima corrida." />
+<meta property="og:url" content="https://www.goathisetups.com/" />
+<meta property="og:image" content="https://www.goathisetups.com/artes/escuro/og_image_escuro.png" />
+<meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta property="og:image:alt" content="Goathi Setups — setups, ERS e estratégia para F1 26 DLC" />
+<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:image" content="https://www.goathisetups.com/artes/escuro/og_image_escuro.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="./logos/favicon_32.png" /><link rel="apple-touch-icon" sizes="180x180" href="./logos/favicon_180.png" /><link rel="icon" sizes="192x192" href="./logos/favicon_192.png" /><link rel="icon" sizes="512x512" href="./logos/favicon_512.png" />
+<script>try{var t=localStorage.getItem('goathi-theme');document.documentElement.dataset.theme=t==='claro'?'claro':'escuro'}catch(e){}</script>
+</head><body><div id="root"></div><script type="module" src="./src/main.jsx"></script></body></html>
