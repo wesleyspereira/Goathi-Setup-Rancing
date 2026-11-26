@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { News, useContent } from './admin/Content'
 import { Feedback } from './admin/Feedback'
+import {registerOrder,newOrderId} from './admin/orderService.js'
 import { shop, products, money, promotionActive } from './data/shop'
 import { tracks } from './data/tracks'
 import './App.css'
@@ -52,20 +53,29 @@ function RaceBanner() {
 }
 
 function Purchase({ product, price, close }) {
+  const [orderId]=useState(newOrderId), [name,setName]=useState(''), [busy,setBusy]=useState(false), [error,setError]=useState(''), [saved,setSaved]=useState('')
+
   const ref = useRef(null), [circuit, setCircuit] = useState(''), [notes, setNotes] = useState('')
   useEffect(() => {
     const trigger = document.activeElement, overflow = document.body.style.overflow
     ref.current.showModal(); document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = overflow; trigger?.focus() }
   }, [])
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
+    if(busy)return
+    setBusy(true);setError('')
+    let orderCode=saved
+    try {
+      if(!orderCode){orderCode=await registerOrder(orderId,product,price,circuit,notes,name.trim());setSaved(orderCode)}
+    } catch {setError('Não foi possível registrar seu pedido. Tente novamente ou use o WhatsApp na seção Contato.');setBusy(false);return}
+    setBusy(false)
     const checkout = shop.checkout[product.id]
-    if (checkout && price != null) { window.open(checkout, '_blank', 'noopener,noreferrer'); return }
-    const message = [`Olá, Goathi! Quero adquirir ${product.name}.`, `Valor: ${money(price)}`, circuit && `Pista: ${circuit}`, notes && `Observações: ${notes}`].filter(Boolean).join('\n')
-    window.open(`https://wa.me/${shop.whatsapp}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+    if (checkout && price != null) { window.location.assign(checkout); return }
+    const message = [`Olá, Goathi! Quero adquirir ${product.name}.`, `Pedido: ${orderCode}`, `Nome: ${name.trim()}`, `Valor: ${money(price)}`, circuit && `Pista: ${circuit}`, notes && `Observações: ${notes}`].filter(Boolean).join('\n')
+    window.location.assign(`https://wa.me/${shop.whatsapp}?text=${encodeURIComponent(message)}`)
   }
-  return <dialog ref={ref} className="purchase-dialog" aria-labelledby="purchase-title" onCancel={close}><button className="close-dialog" onClick={close} aria-label="Fechar pedido">Fechar</button><p className="eyebrow">SEU PEDIDO</p><h2 id="purchase-title">{product.name}</h2><p className="price">{money(price)}</p><form onSubmit={submit}>{product.id === 'individual' && <label>Circuito<select required value={circuit} onChange={e => setCircuit(e.target.value)}><option value="">Selecione uma pista</option>{tracks.map(t => <option key={t.name}>{t.name}</option>)}</select></label>}<label>Observações (opcional)<textarea maxLength={1000} value={notes} onChange={e => setNotes(e.target.value)} /></label><p>Confirme disponibilidade, pagamento e entrega com a Goathi. Nenhuma cobrança é realizada nesta página.</p><button className="btn" type="submit">Continuar compra</button></form></dialog>
+  return <dialog ref={ref} className="purchase-dialog" aria-labelledby="purchase-title" onCancel={close}><button className="close-dialog" onClick={close} aria-label="Fechar pedido">Fechar</button><p className="eyebrow">SEU PEDIDO</p><h2 id="purchase-title">{product.name}</h2><p className="price">{money(price)}</p><form onSubmit={submit}><label>Nome<input required maxLength={60} value={name} onChange={e=>setName(e.target.value)} autoComplete="name" /></label>{product.id === 'individual' && <label>Circuito<select required value={circuit} onChange={e => setCircuit(e.target.value)}><option value="">Selecione uma pista</option>{tracks.map(t => <option key={t.name}>{t.name}</option>)}</select></label>}<label>Observações (opcional)<textarea maxLength={1000} value={notes} onChange={e => setNotes(e.target.value)} /></label><p>Confirme disponibilidade, pagamento e entrega com a Goathi. Nenhuma cobrança é realizada nesta página.</p><p role="status">{error}</p><button className="btn" type="submit" disabled={busy}>{busy ? 'Registrando…' : 'Continuar compra'}</button></form></dialog>
 }
 export default function App() {
   const { prices, promotion } = useContent()

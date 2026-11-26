@@ -33,6 +33,41 @@ service cloud.firestore {
       allow update: if admin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && request.resource.data.status in ['pending','approved','rejected'];
       allow delete: if admin();
     }
+    match /counters/orders {
+      allow get: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['lastNumber','lastOrderId'])
+        && request.resource.data.lastNumber is int
+        && request.resource.data.lastNumber == (exists(/databases/$(database)/documents/counters/orders) ? resource.data.lastNumber + 1 : 1)
+        && request.resource.data.lastOrderId is string
+        && !exists(/databases/$(database)/documents/orders/$(request.resource.data.lastOrderId))
+        && getAfter(/databases/$(database)/documents/orders/$(request.resource.data.lastOrderId)).data.uid == request.auth.uid
+        && getAfter(/databases/$(database)/documents/orders/$(request.resource.data.lastOrderId)).data.number == request.resource.data.lastNumber;
+    }
+    match /orders/{orderId} {
+      allow delete: if admin() && resource.data.status in ['pending','lost'];
+      allow list: if admin();
+      allow get: if admin() || (request.auth != null && (!exists(/databases/$(database)/documents/orders/$(orderId)) || resource.data.uid == request.auth.uid));
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['uid','number','product','productName','quotedCents','circuit','notes','name','status','createdAt'])
+        && request.resource.data.number is int && request.resource.data.number > 0
+        && getAfter(/databases/$(database)/documents/counters/orders).data.lastNumber == request.resource.data.number
+        && getAfter(/databases/$(database)/documents/counters/orders).data.lastOrderId == orderId
+        && request.resource.data.number == (exists(/databases/$(database)/documents/counters/orders) ? get(/databases/$(database)/documents/counters/orders).data.lastNumber + 1 : 1)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.product in ['individual','pack','ers','pro']
+        && request.resource.data.productName is string && request.resource.data.productName.size() <= 80
+        && (request.resource.data.quotedCents == null || (request.resource.data.quotedCents is int && request.resource.data.quotedCents >= 0 && request.resource.data.quotedCents <= 9999900))
+        && request.resource.data.circuit is string && request.resource.data.circuit.size() <= 100
+        && request.resource.data.notes is string && request.resource.data.notes.size() <= 1000
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.status == 'pending' && request.resource.data.createdAt == request.time;
+      allow update: if admin() && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','receivedCents','resolvedAt'])
+        && request.resource.data.status in ['sold','lost']
+        && request.resource.data.receivedCents is int && request.resource.data.receivedCents >= 0 && request.resource.data.receivedCents <= 100000000
+        && request.resource.data.resolvedAt == request.time;
+    }
     match /cashEntries/{entryId} {
       allow read, delete: if admin();
       allow create, update: if admin()

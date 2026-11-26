@@ -46,7 +46,7 @@ export function Feedback() {
       const target = doc(db, 'feedbacks', user.uid)
       if ((await getDoc(target)).exists()) { setMessage('Você já enviou um feedback. Obrigado pela participação!'); return }
       await setDoc(target, { name: name.trim(), rating, product, comment: comment.trim(), status: 'pending', createdAt: serverTimestamp() })
-      setMessage('Feedback enviado! Ele será exibido após aprovação da Goathi.'); setName(''); setComment(''); setProduct(''); setRating(0)
+      setMessage('Obrigado! Seu feedback foi enviado.'); setName(''); setComment(''); setProduct(''); setRating(0)
     } catch (error) {
   console.error('Erro ao enviar feedback:', error);
   setMessage('Não foi possível enviar o feedback.');
@@ -56,7 +56,7 @@ export function Feedback() {
   return <section id="feedbacks" className="container section">
     <p className="eyebrow">QUEM JÁ ESTÁ NA PISTA</p>
     <div className="section-heading"><h2>Na voz dos <em>pilotos.</em></h2><button className="btn btn--ghost" onClick={() => {setMessage(''); setOpen(true)}}>Deixar avaliação</button></div>
-    <div className="feedback-summary"><strong>{average} / 5</strong><span className="rating" aria-hidden="true">★★★★★</span><span>{items.length} {items.length === 1 ? 'avaliação aprovada' : 'avaliações aprovadas'}</span></div>
+    <div className="feedback-summary" aria-label={`Média das notas: ${average} de 5`}><strong>{average}</strong>{items.length > 0 && <span className="feedback-average-stars" aria-hidden="true"><span>★★★★★</span><span className="feedback-average-fill" style={{width: `${Number(average.replace(',', '.')) / 5 * 100}%`}}>★★★★★</span></span>}</div>
     {loadError && <p role="status">{loadError}</p>}
     <div className="feedback-carousel" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onFocus={() => setHover(true)} onBlur={e => {if (!e.currentTarget.contains(e.relatedTarget)) setHover(false)}}>
       <div className="feedback-grid"><div>{items.length ? items.slice(current * perPage, (current+1)*perPage).map(item => <article className="card feedback-card" key={item.id}>
@@ -66,7 +66,7 @@ export function Feedback() {
       {pages > 1 && <div className="feedback-controls"><button type="button" aria-label="Feedbacks anteriores" onClick={() => setIndex((current+pages-1)%pages)}>‹</button><span>{current+1} / {pages}</span><button type="button" aria-label="Próximos feedbacks" onClick={() => setIndex((current+1)%pages)}>›</button><button type="button" onClick={() => setPaused(v => !v)}>{paused ? 'Reproduzir' : 'Pausar'}</button></div>}
     </div>
     {open && <Modal title="Deixar avaliação" close={() => setOpen(false)}><form className="feedback-form" onSubmit={send}>
-      <h3>Conte sua experiência</h3><p>Seu nome, setup, nota, data e comentário poderão aparecer no site após aprovação.</p>
+      <h3>Conte sua experiência</h3><p>Compartilhe sua experiência com a Goathi.</p>
       <fieldset disabled={busy || !db}>
         <label>Nome<input required maxLength={60} autoComplete="given-name" value={name} onChange={e => setName(e.target.value)}/></label>
         <label>Setup adquirido<select required value={product} onChange={e => setProduct(e.target.value)}><option value="">Selecione seu setup</option>{Object.entries(products).map(([key,label]) => <option key={key} value={key}>{label}</option>)}</select></label>
